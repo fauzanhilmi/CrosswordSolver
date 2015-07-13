@@ -1,0 +1,279 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Crossword Solver</title>
+		<!--<script type="text/javascript" src="angular/angular.min.js"></script>-->
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular-route.js"></script>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+      	<!-- Bootstrap -->
+      	<link href="css/bootstrap.min.css" rel="stylesheet">
+		<style type="text/css">
+   			body { 
+   				background: DeepSkyBlue; 
+   			}
+   			.container {
+   				position: relative !important; 
+   			}
+   			.absolute-center {
+				width: 50% !important;
+				height: 50% !important;
+				overflow: auto !important;
+				margin: auto !important;
+				position: absolute !important;
+				top: 0 !important; 
+				left: 0 !important; 
+				bottom: 0 !important; 
+				right: 0 !important;
+				position: absolute !important;/*
+			  	top: 50% !important;
+			  	left: 50% !important;
+			  	transform: translate(-50%, -50%) !important;*/
+			}
+			.vcenter {
+				min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+				min-height: 100vh; /* These two lines are counted as one :-)       */
+
+				display: flex;
+				align-items: center;
+			}
+		</style>
+	</head>
+	
+	<body ng-app="mainApp" style="position:relative;">
+		<!--<div class="container" style="position:relative;">
+			<div class="row">
+				<div class="col-md-8 col-md-offset-2">-->
+					<div ng-view>
+					</div>
+				<!--</div>
+			</div>
+		</div>-->
+		<!--<canvas id="main_canvas" width="1000" height="1000" style="border: 1px solid #cccccc;"></canvas>-->
+		<input type="file" accept=".txt" onchange="upload_kamus(event)" style="display: none;">
+		<output id="preview" style="display: none;">
+	</body>
+</html>
+<script type="text/javascript">
+	var kamus = [];
+	var cw = [];
+	var mat = [];
+	var guide = [];
+	var max;
+
+	var upload_cw =  function(event) {
+		var input = event.target;
+
+		var reader = new FileReader();
+		reader.onload = function(){
+			var contents = reader.result;
+			var output = document.getElementById("preview");
+			output.value = contents;
+			cw = contents.split("\n");
+		};
+		reader.readAsText(input.files[0]);
+	};
+
+	var upload_kamus = function(event) {
+		var input = event.target;
+
+		var reader = new FileReader();
+		reader.onload = function(){
+			var contents = reader.result;
+			var output = document.getElementById("preview");
+			output.value = contents;
+			kamus = contents.split("\n");
+		};
+		reader.readAsText(input.files[0]);
+	};
+
+	function parse_cw() { 
+		var row = 0;
+		var col = 0;
+		for(var i=0; i<cw.length; i++) {
+			var line = cw[i];
+			var arr = line.split(" ");
+			if((arr[3]=="mendatar" || arr[3]=="mendatar\r") && parseInt(arr[2],10)-1+arr[0].length>col)
+				col = parseInt(arr[2],10)-1+arr[0].length;
+			else if((arr[3]=="menurun" || arr[3]=="menurun\r") && parseInt(arr[1],10)-1+arr[0].length>row)
+				row = parseInt(arr[1],10)-1+arr[0].length;
+		}	
+		for(var i=0; i<row; i++) {
+			mat[i] = new Array(col);
+			for(var j=0; j<mat[i].length; j++) 
+				mat[i][j] = '0';
+		}
+		for(var i=0; i<cw.length; i++) {
+			var line = cw[i];
+			var arr = line.split(" ");
+			var r = parseInt(arr[1],10)-1;
+			var c = parseInt(arr[2],10)-1;
+			if(arr[3]=="mendatar" || arr[3]=="mendatar\r") {
+				var idx = 0;
+				//for(var j=parseInt(arr[2],10)-1; j<=arr[0].length; j++) {
+				for(var j=c; j<c+arr[0].length; j++) {
+					mat[r][j] = arr[0].charAt(idx);
+					idx++;
+				}
+				var g_arr = [];
+				g_arr.push('a');
+				g_arr.push(r);
+				g_arr.push(c);
+				g_arr.push(arr[0].length);
+				guide.push(g_arr);
+			}
+			else if(arr[3]=="menurun" || arr[3]=="menurun\r") {
+				var idx = 0;
+				// for(var j=parseInt(arr[1],10)-1; j<=arr[0].length; j++) {
+				for(var j=r; j<r+arr[0].length; j++) {
+					mat[j][c] = arr[0].charAt(idx);
+					idx++;
+				}
+				var g_arr = [];
+				g_arr.push('d');
+				g_arr.push(r);
+				g_arr.push(c);
+				g_arr.push(arr[0].length);
+				guide.push(g_arr);
+			}
+		}
+		// return mat;
+	}
+
+	function solve(idx) {
+		if(idx>=max) return true;
+
+		var dir = guide[idx][0];
+		var r = guide[idx][1];
+		var c = guide[idx][2];
+		var length = guide[idx][3];
+		var pattern = "";
+		if(dir=='a') {
+			for(var i=c; i<c+length; i++) {
+				pattern += mat[r][i];
+			}
+		}
+		else if(dir=='d') {
+			for(var i=r; i<r+length; i++) {
+				pattern += mat[i][c];
+			}	
+		}
+		console.log(r+" "+c+" "+length+" "+pattern);
+		for(var i=0; i<kamus.length; i++) {
+			if(is_match(kamus[i],pattern)) {
+				fill(dir,r,c,kamus[i]);
+				if(solve(idx+1)) {
+					return true;
+				}
+				// ??else {
+
+				// }
+			}
+		}
+
+		fill(dir,r,c,pattern);
+		return false;
+	}
+
+	function is_match(text,pattern) {
+		if(text.length!=pattern.length) return false;
+		var map = {};
+		for(var i=0; i<pattern.length; i++) {
+			if(pattern[i]!='.') 
+				map[i] = pattern[i];
+		}
+		for(var i in map) {
+			if(text.charAt(i)!=map[i]){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	function fill(dir,r,c,text) {
+		var idx = 0;
+		if(dir=='a') {
+			for(var i=c; i<c+text.length; i++) {
+				mat[r][i] = text.charAt(idx);
+				idx++;
+			}
+		}
+		else if(dir=='d') {
+			for(var i=r; i<r+text.length; i++) {
+				mat[i][c] = text.charAt(idx);
+				idx++;
+			}	
+		}		
+	}
+
+	//Angular codes
+	var app = angular.module('mainApp',['ngRoute']);
+	app.config(function($routeProvider) {
+		$routeProvider
+			.when('/canvas', {
+				templateUrl : 'canvas.html',
+				controller : 'canvasController'
+			})
+			.otherwise({
+				templateUrl : 'home.html',
+				controller : 'mainController'
+			});
+	});
+	
+	app.controller('mainController', ['$scope','$location', function($scope, $location) {
+
+		$scope.generate = function() {
+			parse_cw();
+			for(var i=0; i<mat.length; i++) {
+				console.log(mat[i]);
+			}
+			console.log("lewat parse cw");
+			// for(var i=0; i<guide.length; i++) {
+			// 	console.log(guide[i]);
+			// }
+			max = guide.length;
+			alert(solve(0));
+			for(var i=0; i<mat.length; i++) {
+				console.log(mat[i]);
+			}
+			$location.url('/canvas');
+		};
+	}]);
+
+	app.controller('canvasController', function($scope) {
+		var main_canvas = document.getElementById('main_canvas');
+		if(main_canvas.getContext) {
+			var ctx = main_canvas.getContext('2d');
+			// ctx.lineWidth = 3;
+			// ctx.strokeRect(10,10,40,40);
+			// ctx.font      = "normal 36px Verdana";
+			// ctx.fillStyle = "#000000";
+			// ctx.fillText("A", 17, 43);
+
+			var letter = 1;
+			// var letter = 'A'; //var l_idx = 1;
+			var font = "normal 20px Arial";
+			var width = 30;
+			var height = 30;
+			var size = 30;
+			var x0 = 10; var y0 = 10;
+			for(var j=0; j<height; j++) {
+				for(var i=0; i<width; i++) {
+					ctx.lineWidth = 2;
+					ctx.strokeRect(x0+(i*size),y0+(j*size),size,size);
+					ctx.font      = font;
+					ctx.fillStyle = "#000000";
+					ctx.fillText(letter, x0+(i*size)+7, y0+(j*size)+33);					
+					// letter = String.fromCharCode(letter.charCodeAt() + 1);
+					letter++;
+				}
+				letter = (j+1)*10;
+			}
+
+		}
+		else {
+			alert("Your browser doesn't support HTML5 Canvas");
+		}
+	});
+</script>
