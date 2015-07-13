@@ -60,6 +60,7 @@
 	var cw = [];
 	var mat = [];
 	var guide = [];
+	var output = [];
 	var max;
 
 	var upload_cw =  function(event) {
@@ -68,8 +69,6 @@
 		var reader = new FileReader();
 		reader.onload = function(){
 			var contents = reader.result;
-			var output = document.getElementById("preview");
-			output.value = contents;
 			cw = contents.split("\n");
 		};
 		reader.readAsText(input.files[0]);
@@ -81,20 +80,54 @@
 		var reader = new FileReader();
 		reader.onload = function(){
 			var contents = reader.result;
-			var output = document.getElementById("preview");
-			output.value = contents;
 			kamus = contents.split("\n");
 		};
 		reader.readAsText(input.files[0]);
 	};
 
-	function output(text, name) {
+	function download_output(text) {
 	    var a = window.document.createElement('a');
 		a.href = window.URL.createObjectURL(new Blob([text], {type: 'text/plain'}));
-		a.download = name;
+		a.download = "output.txt";
 		document.body.appendChild(a)
 		a.click();
 		document.body.removeChild(a)
+	}
+
+	function make_output() {
+		var ou = "";
+		for(var i=0; i<guide.length; i++) {
+			var dir = guide[i][0];
+			var r = guide[i][1];
+			var c = guide[i][2];
+			var length = guide[i][3];
+			var sol = "";
+			if(dir=='a') {
+				for(var j=c; j<c+length; j++) {
+					sol += mat[r][j];
+				}
+				dir = "mendatar";
+			}
+			else if(dir=='d') {
+				for(var j=r; j<r+length; j++) {
+					sol += mat[j][c];
+				}	
+				dir = "menurun";
+			}
+			r++; c++;
+			var spc = " ";
+			var nl = "\n";
+			ou += sol;
+			ou += spc;
+			ou += r;
+			ou += spc;
+			ou += c;
+			ou += spc;
+			ou += dir;
+			ou += nl;
+		}
+		ou = ou.replace(/([^\r])\n/g, "$1\r\n");
+		return ou;
 	}
 
 	function parse_cw() { 
@@ -168,7 +201,7 @@
 				pattern += mat[i][c];
 			}	
 		}
-		console.log(r+" "+c+" "+length+" "+pattern);
+		// console.log(r+" "+c+" "+length+" "+pattern);
 		for(var i=0; i<kamus.length; i++) {
 			if(is_match(kamus[i],pattern)) {
 				fill(dir,r,c,kamus[i]);
@@ -234,6 +267,7 @@
 
 		$scope.generate = function() {
 			parse_cw();
+			// console.log(guide);
 			// for(var i=0; i<mat.length; i++) {
 			// 	console.log(mat[i]);
 			// }
@@ -241,13 +275,12 @@
 			// for(var i=0; i<guide.length; i++) {
 			// 	console.log(guide[i]);
 			// }
-			// max = guide.length;
-			// alert(solve(0));
-			// for(var i=0; i<mat.length; i++) {
-			// 	console.log(mat[i]);
-			// }
-
-			output(guide,"output.txt");
+			max = guide.length;
+			solve(0);
+			for(var i=0; i<mat.length; i++) {
+				console.log(mat[i]);
+			}
+			output = make_output();
 			$location.url('/canvas');
 		};
 	}]);
