@@ -291,9 +291,13 @@
 
 	app.controller('canvasController', function($scope) {
 		var main_canvas = document.getElementById('main_canvas');
+		exec_time = Math.round(exec_time)/1000;
+		var s_time = "Solve time: ";
+		s_time += exec_time;
+		s_time += " s";
 		//TES
-		// var tes = document.getElementById("test").value = exec_time;
-		alert(exec_time);
+		// s_time = "Solve time: 1116.827 s";
+		document.getElementById("time_p").innerHTML = s_time;
 		if(main_canvas.getContext) {
 			var ctx = main_canvas.getContext('2d');
 			// ctx.lineWidth = 3;
