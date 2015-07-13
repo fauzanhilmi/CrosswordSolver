@@ -88,6 +88,15 @@
 		reader.readAsText(input.files[0]);
 	};
 
+	function output(text, name) {
+	    var a = window.document.createElement('a');
+		a.href = window.URL.createObjectURL(new Blob([text], {type: 'text/plain'}));
+		a.download = name;
+		document.body.appendChild(a)
+		a.click();
+		document.body.removeChild(a)
+	}
+
 	function parse_cw() { 
 		var row = 0;
 		var col = 0;
@@ -225,18 +234,20 @@
 
 		$scope.generate = function() {
 			parse_cw();
-			for(var i=0; i<mat.length; i++) {
-				console.log(mat[i]);
-			}
-			console.log("lewat parse cw");
+			// for(var i=0; i<mat.length; i++) {
+			// 	console.log(mat[i]);
+			// }
+			// console.log("lewat parse cw");
 			// for(var i=0; i<guide.length; i++) {
 			// 	console.log(guide[i]);
 			// }
-			max = guide.length;
-			alert(solve(0));
-			for(var i=0; i<mat.length; i++) {
-				console.log(mat[i]);
-			}
+			// max = guide.length;
+			// alert(solve(0));
+			// for(var i=0; i<mat.length; i++) {
+			// 	console.log(mat[i]);
+			// }
+
+			output(guide,"output.txt");
 			$location.url('/canvas');
 		};
 	}]);
