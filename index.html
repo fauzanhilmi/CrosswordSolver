@@ -62,6 +62,7 @@
 	var guide = [];
 	var output = [];
 	var max;
+	var exec_time = 0;
 
 	var upload_cw =  function(event) {
 		var input = event.target;
@@ -266,6 +267,7 @@
 	app.controller('mainController', ['$scope','$location', function($scope, $location) {
 
 		$scope.generate = function() {
+			var stime = performance.now();
 			parse_cw();
 			// console.log(guide);
 			// for(var i=0; i<mat.length; i++) {
@@ -277,6 +279,8 @@
 			// }
 			max = guide.length;
 			solve(0);
+			var ftime = performance.now();
+			exec_time = ftime - stime;
 			for(var i=0; i<mat.length; i++) {
 				console.log(mat[i]);
 			}
@@ -287,6 +291,9 @@
 
 	app.controller('canvasController', function($scope) {
 		var main_canvas = document.getElementById('main_canvas');
+		//TES
+		// var tes = document.getElementById("test").value = exec_time;
+		alert(exec_time);
 		if(main_canvas.getContext) {
 			var ctx = main_canvas.getContext('2d');
 			// ctx.lineWidth = 3;
