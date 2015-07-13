@@ -1,3 +1,6 @@
+<!--<div style="margin-left:auto; margin-right:auto;">
+	<canvas class="cnv" id="main_canvas" width="330" height="330" style="border: 1px solid #cccccc; background-color:#eee;"></canvas>
+</div>-->
 <div class="container">
 	<!--<div class="row">
 		<div class="col-md-11 col-md-offset-1">-->
@@ -5,9 +8,10 @@
 			<!--<table style="width: 100%;">
 				<tr>
 					<td style="text-align: center; vertical-align: middle;">-->
-						<div class="row">
-							<div class="col-md-8 col-md-offset-2">
-						<canvas id="main_canvas" width="330" height="330" style="border: 1px solid #cccccc; background-color:#eee;"></canvas>
+						<div class="row" style="margin-top:100px;">
+							<div class="col-md-12">
+						<canvas class="cnv" id="main_canvas" width="100" height="100" style="border: 1px solid #cccccc; background-color:#eee;"></canvas>
+						<!--<canvas id="main_canvas" width="80" height="80" style="border: 1px solid #cccccc; background-color:#eee;"></canvas>-->
 							</div>
 						</div>
 						<div class="row">
@@ -15,15 +19,15 @@
 								<div class="jumbotron">
 									<div class="row">
 										<div class="col-md-7">
-											<p id="time_p" style="font-size:23px; margin: 0px; padding: 0px;"></p>
+											<p id="time_p" style="font-size:22px; margin: 0px; padding: 0px;"></p>
 										</div>
-										<div class="col-md-4">
-											<input type="submit" id="download_button" onclick="download_output(output)" class="btn btn-primary" value="Download Output">
+										<div class="col-md-5">
+											<input type="submit" id="download_button" onclick="download_output(output)" class="btn btn-primary btn-block" value="Download Solution">
 										</div>
 									</div>
 									<div class="row" style="margin-top:20px;">
-										<div class="col-md-4 col-md-offset-4">
-											<input type="submit" id="solve_again_button" class="btn btn-warning btn-lg" value="SOLVE AGAIN">
+										<div class="col-md-8 col-md-offset-2">
+											<input type="submit" id="solve_again_button" ng-click="solve_again()" class="btn btn-block btn-warning btn-lg" value="SOLVE AGAIN">
 										</div>
 									</div>
 								</div>

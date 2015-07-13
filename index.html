@@ -13,6 +13,14 @@
    			body { 
    				background: DeepSkyBlue; 
    			}
+   			.cnv {
+			    padding-left: 0;
+			    padding-right: 0;
+			    margin-left: auto;
+			    margin-right: auto;
+			    display: block;
+			    /*width: 800px;*/
+			}
    			.container {
    				position: relative !important; 
    			}
@@ -289,16 +297,22 @@
 		};
 	}]);
 
-	app.controller('canvasController', function($scope) {
+	app.controller('canvasController', function($scope, $location) {
 		var main_canvas = document.getElementById('main_canvas');
 		exec_time = Math.round(exec_time)/1000;
 		var s_time = "Solve time: ";
 		s_time += exec_time;
 		s_time += " s";
+		document.getElementById("time_p").innerHTML = s_time;
 		//TES
 		// s_time = "Solve time: 1116.827 s";
-		document.getElementById("time_p").innerHTML = s_time;
-		if(main_canvas.getContext) {
+		var width  = mat.length;
+		var height = mat[0].length;
+		var c_width = 50+((width-1)*30);
+		var c_height = 50+((height-1)*30);
+		document.getElementById("main_canvas").width = c_width;
+		document.getElementById("main_canvas").height = c_height;
+		// if(main_canvas.getContext) {
 			var ctx = main_canvas.getContext('2d');
 			// ctx.lineWidth = 3;
 			// ctx.strokeRect(10,10,40,40);
@@ -306,29 +320,50 @@
 			// ctx.fillStyle = "#000000";
 			// ctx.fillText("A", 17, 43);
 
-			var letter = 1;
-			// var letter = 'A'; //var l_idx = 1;
+			// var letter = 1;
+			var letter = 'A'; //var l_idx = 1;
 			var font = "normal 20px Arial";
-			var width = 30;
-			var height = 30;
+			// var width = 2;
+			// var height = 2;
+			// var width  = mat.length;
+			// var height = mat[0].length;
 			var size = 30;
 			var x0 = 10; var y0 = 10;
-			for(var j=0; j<height; j++) {
-				for(var i=0; i<width; i++) {
-					ctx.lineWidth = 2;
-					ctx.strokeRect(x0+(i*size),y0+(j*size),size,size);
-					ctx.font      = font;
-					ctx.fillStyle = "#000000";
-					ctx.fillText(letter, x0+(i*size)+7, y0+(j*size)+33);					
-					// letter = String.fromCharCode(letter.charCodeAt() + 1);
-					letter++;
+			// for(var j=0; j<height; j++) {
+			// 	for(var i=0; i<width; i++) {
+			// 		ctx.lineWidth = 2;
+			// 		ctx.strokeRect(x0+(i*size),y0+(j*size),size,size);
+			// 		ctx.font      = font;
+			// 		ctx.fillStyle = "#000000";
+			// 		ctx.fillText(letter, x0+(i*size)+8, y0+(j*size)+23);					
+			// 		letter = String.fromCharCode(letter.charCodeAt() + 1);
+			// 		// letter++;
+			// 	}
+			// 	// letter = (j+1)*10;
+			// }
+
+			for(var i=0; i<height; i++) {
+				for(var j=0; j<width; j++) {
+					if(mat[i][j]>='a' && mat[i][j]<='z') {
+						ctx.lineWidth = 1;
+						ctx.strokeRect(x0+(j*size),y0+(i*size),size,size);
+						ctx.font      = font;
+						ctx.fillStyle = "#000000";
+						ctx.fillText(mat[i][j].toUpperCase(), x0+(j*size)+8, y0+(i*size)+23);					
+					}
+					else {
+						ctx.fillRect(x0+(j*size),y0+(i*size),size,size); 
+					}
 				}
-				letter = (j+1)*10;
 			}
 
-		}
-		else {
-			alert("Your browser doesn't support HTML5 Canvas");
+		// }
+		// else {
+		// 	alert("Your browser doesn't support HTML5 Canvas");
+		// }
+
+		$scope.solve_again = function() {
+			$location.url('/');
 		}
 	});
 </script>
